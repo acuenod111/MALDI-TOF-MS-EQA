@@ -564,11 +564,12 @@ eval_stat_q$how_long_matrix_stats <- NULL
 # summarise by how the strains were processed for these measurements
 eval2<-ID_eval(eval_file = eval_stat_q, grouping_variable1 = How.did.you.process.the.received.strains., grouping_variable2 = MALDI.system)
 plot_data<-summarise_prop_and_eval(eval_file = eval_stat_q, ID_eval_out = eval2, grouping_variable1 = "How.did.you.process.the.received.strains.", grouping_variable2 = "MALDI.system")
+# a warning appears: NA introduced by coersion. There are 91 rows who have a NA 'value' entry. These are the 'frac_peaks_repr_2spectra' from device_30 and device_42, were only one technical replicate was measured in baseline quality assessment
 # Define the order in which the different procedures are plotted
 plot_data$How.did.you.process.the.received.strains.<-factor(plot_data$How.did.you.process.the.received.strains., c("freeze.streak.out", "freeze.streak.out.subculture.once", "direct.streak.out.from.eswab", "streak.out.from.eswab.subcultured.once"), 
                                                               labels = c('procedure A', 'procedure B', 'procedure C', 'procedure D'))
 # Define the margins where to plot the red highlight
-plot_data['highlight']<-ifelse(plot_data$How.did.you.process.the.received.strains. == "Frozen, no additional\nsubculture after thawing", 1, 0.4)
+plot_data['highlight']<-ifelse(plot_data$How.did.you.process.the.received.strains. == "procedure A", 1, 0.4)
 
 # plot
 f7_how_processed <- plot_plot_data_highlight(plot_data = plot_data, grouping_variable = How.did.you.process.the.received.strains., highlight_color = "#E76F51")
@@ -581,24 +582,32 @@ f7_how_processed <- f7_how_processed + stat_compare_means(method = 'wilcox', pai
 # How many samples are measured in the laboratory
 eval2<-ID_eval(eval_file = eval_stat_q, grouping_variable1 = How.many.MALDI.TOF.MS.measurements.per.day.have.been.performed.on.average.within.the.last.month., grouping_variable2 = MALDI.system)
 plot_data<-summarise_prop_and_eval(eval_file = eval_stat_q, ID_eval_out = eval2, grouping_variable1 = "How.many.MALDI.TOF.MS.measurements.per.day.have.been.performed.on.average.within.the.last.month.", grouping_variable2 = "MALDI.system")
+# remove the 91 rows with NA values which correspond to the frac_peaks_repr_2spectra fro device 30 and device 42 were only one technical replicte was measured for baseline quality assessment
+plot_data <- plot_data[!is.na(plot_data$value),]
 f7_how<-plot_plot_data(plot_data = plot_data, grouping_variable = How.many.MALDI.TOF.MS.measurements.per.day.have.been.performed.on.average.within.the.last.month.)
-f7_how
+f7_how 
 
 # When are the samples measured after they have been applied onto the target plate
 eval2<-ID_eval(eval_file = eval_stat_q, grouping_variable1 = When.are.the.MALDI.TOF.MS.targets.measured., grouping_variable2 = MALDI.system)
 plot_data<-summarise_prop_and_eval(eval_file = eval_stat_q, ID_eval_out = eval2, grouping_variable1 = "When.are.the.MALDI.TOF.MS.targets.measured.", grouping_variable2 = "MALDI.system")
+# remove the 91 rows with NA values which correspond to the frac_peaks_repr_2spectra fro device 30 and device 42 were only one technical replicte was measured for baseline quality assessment
+plot_data <- plot_data[!is.na(plot_data$value),]
 f7_how<-plot_plot_data(plot_data = plot_data, grouping_variable = When.are.the.MALDI.TOF.MS.targets.measured.)
 f7_how
 
 # Which MALDI devices was used
 eval2<-ID_eval(eval_file = eval_stat_q, grouping_variable1 = MALDI.type, grouping_variable2 = MALDI.system)
 plot_data<-summarise_prop_and_eval(eval_file = eval_stat_q, ID_eval_out = eval2, grouping_variable1 = "MALDI.type", grouping_variable2 = "MALDI.system")
+# remove the 91 rows with NA values which correspond to the frac_peaks_repr_2spectra fro device 30 and device 42 were only one technical replicte was measured for baseline quality assessment
+plot_data <- plot_data[!is.na(plot_data$value),]
 f7_how<-plot_plot_data(plot_data = plot_data, grouping_variable = MALDI.type)
 f7_how
 
 # Which target plates where used for these measurements
 eval2<-ID_eval(eval_file = eval_stat_q, grouping_variable1 = Which.target.plates.do.you.use., grouping_variable2 = MALDI.system)
 plot_data<-summarise_prop_and_eval(eval_file = eval_stat_q, ID_eval_out = eval2, grouping_variable1 = "Which.target.plates.do.you.use.", grouping_variable2 = "MALDI.system")
+# remove the 91 rows with NA values which correspond to the frac_peaks_repr_2spectra fro device 30 and device 42 were only one technical replicte was measured for baseline quality assessment
+plot_data <- plot_data[!is.na(plot_data$value),]
 plot_data$Which.target.plates.do.you.use.<-factor(plot_data$Which.target.plates.do.you.use., levels = c("Steel target", "Disposable"))
 f7_which_target <- plot_plot_data_highlight(plot_data = plot_data, grouping_variable = Which.target.plates.do.you.use., highlight_color = "#2A9D8F")
 f7_which_target <- f7_which_target + ggtitle('Target plates used') + stat_compare_means(method = 'wilcox', paired = F, label = 'p.signif', label.y.npc = 0.9, ref.group = 'Steel target', alpha = c(rep(1, 4), rep(0, 2)))
@@ -606,6 +615,8 @@ f7_which_target <- f7_which_target + ggtitle('Target plates used') + stat_compar
 # How these target plates are routinely cleaned
 eval2<-ID_eval(eval_file = eval_stat_q, grouping_variable1 = How.clean.target.plate, grouping_variable2 = MALDI.system)
 plot_data<-summarise_prop_and_eval(eval_file = eval_stat_q, ID_eval_out = eval2, grouping_variable1 = "How.clean.target.plate", grouping_variable2 = "MALDI.system")
+# remove the 91 rows with NA values which correspond to the frac_peaks_repr_2spectra fro device 30 and device 42 were only one technical replicte was measured for baseline quality assessment
+plot_data <- plot_data[!is.na(plot_data$value),]
 plot_data <- plot_data[!plot_data$How.clean.target.plate == 'Disposable', ]
 plot_data$How.clean.target.plate<-factor(plot_data$How.clean.target.plate, levels = c("Methanole-Acetone", "TFA","Other"))
 f7_how_clean <- plot_plot_data_highlight(plot_data = plot_data, grouping_variable = How.clean.target.plate, highlight_color = "#2A9D8F")
@@ -623,49 +634,66 @@ dev.off()
 # Whether wooden toothpicks or plastic inoculation needles are used to transfer bacterial material from the media onto the target plate
 eval2<-ID_eval(eval_file = eval_stat_q, grouping_variable1 = What.do.you.use.for.applying.the.bacterial.colony.onto.the.MALDI.TOF.MS.target.plate., grouping_variable2 = MALDI.system)
 plot_data<-summarise_prop_and_eval(eval_file = eval_stat_q, ID_eval_out = eval2, grouping_variable1 = "What.do.you.use.for.applying.the.bacterial.colony.onto.the.MALDI.TOF.MS.target.plate.", grouping_variable2 = "MALDI.system")
+# remove the 91 rows with NA values which correspond to the frac_peaks_repr_2spectra fro device 30 and device 42 were only one technical replicte was measured for baseline quality assessment
+plot_data <- plot_data[!is.na(plot_data$value),]
 f7_how<-plot_plot_data(plot_data = plot_data, grouping_variable = What.do.you.use.for.applying.the.bacterial.colony.onto.the.MALDI.TOF.MS.target.plate.)
 f7_how
 
 # Whether the mass spectral quality is routinely assessed
 eval2<-ID_eval(eval_file = eval_stat_q, grouping_variable1 = Regular.quality.assessment, grouping_variable2 = MALDI.system)
 plot_data<-summarise_prop_and_eval(eval_file = eval_stat_q, ID_eval_out = eval2, grouping_variable1 = "Regular.quality.assessment", grouping_variable2 = "MALDI.system")
+# remove the 91 rows with NA values which correspond to the frac_peaks_repr_2spectra fro device 30 and device 42 were only one technical replicte was measured for baseline quality assessment
+plot_data <- plot_data[!is.na(plot_data$value),]
 f7_how<-plot_plot_data(plot_data = plot_data, grouping_variable = Regular.quality.assessment)
 f7_how
 
 # Whether there are regular hardware services performed to maintain the device
 eval2<-ID_eval(eval_file = eval_stat_q, grouping_variable1 = regular.hardware.service, grouping_variable2 = MALDI.system)
 plot_data<-summarise_prop_and_eval(eval_file = eval_stat_q, ID_eval_out = eval2, grouping_variable1 = "regular.hardware.service", grouping_variable2 = "MALDI.system")
+# remove the 91 rows with NA values which correspond to the frac_peaks_repr_2spectra fro device 30 and device 42 were only one technical replicte was measured for baseline quality assessment
+plot_data <- plot_data[!is.na(plot_data$value),]
 plot_data$regular.hardware.service<-factor(plot_data$regular.hardware.service, levels = c("yes", "no"))
 f7_hardware <- plot_plot_data_highlight(plot_data = plot_data, grouping_variable = regular.hardware.service, highlight_color = "#2A9D8F")
 f7_hardware <- f7_hardware + ggtitle('Regular hardware services') + stat_compare_means(method = 'wilcox', paired = F, label = 'p.signif', label.y.npc = 0.9, ref.group = 'yes', alpha = c(rep(1, 2), rep(0, 1)))
+# a warning will be displayed stating tha the computation failed. this comes from the fact that there is no two groups to compare in the vitekMS group, all laboratories stated regularly performing a hardware service. 
 
 # Whether the technicians operating the MALDI undergo regulat sample preparation training
 eval2<-ID_eval(eval_file = eval_stat_q, grouping_variable1 = samplepre_training, grouping_variable2 = MALDI.system)
 plot_data<-summarise_prop_and_eval(eval_file = eval_stat_q, ID_eval_out = eval2, grouping_variable1 = "samplepre_training", grouping_variable2 = "MALDI.system")
+# remove the 91 rows with NA values which correspond to the frac_peaks_repr_2spectra fro device 30 and device 42 were only one technical replicte was measured for baseline quality assessment
+plot_data <- plot_data[!is.na(plot_data$value),]
 f7_how<-plot_plot_data(plot_data = plot_data, grouping_variable = samplepre_training)
 f7_how
 
 # Whether strains measured in routine diagnostics are grown on CHROM agar or not
 eval2<-ID_eval(eval_file = eval_stat_q, grouping_variable1 = agar.chrom, grouping_variable2 = MALDI.system)
 plot_data<-summarise_prop_and_eval(eval_file = eval_stat_q, ID_eval_out = eval2, grouping_variable1 = "agar.chrom", grouping_variable2 = "MALDI.system")
+# remove the 91 rows with NA values which correspond to the frac_peaks_repr_2spectra fro device 30 and device 42 were only one technical replicte was measured for baseline quality assessment
+plot_data <- plot_data[!is.na(plot_data$value),]
 f7_how<-plot_plot_data(plot_data = plot_data, grouping_variable = agar.chrom)
 f7_how
 
 # Whether strains measured in routine diagnostics are grown on Sheep Blood agar or not
 eval2<-ID_eval(eval_file = eval_stat_q, grouping_variable1 = agar.sheep.blood, grouping_variable2 = MALDI.system)
 plot_data<-summarise_prop_and_eval(eval_file = eval_stat_q, ID_eval_out = eval2, grouping_variable1 = "agar.sheep.blood", grouping_variable2 = "MALDI.system")
+# remove the 91 rows with NA values which correspond to the frac_peaks_repr_2spectra fro device 30 and device 42 were only one technical replicte was measured for baseline quality assessment
+plot_data <- plot_data[!is.na(plot_data$value),]
 f7_how<-plot_plot_data(plot_data = plot_data, grouping_variable = agar.sheep.blood)
 f7_how
 
 # Whether strains measured in routine diagnostics are grown on 'Other' (other than sheep blood and CHROM agar) agar or not
 eval2<-ID_eval(eval_file = eval_stat_q, grouping_variable1 = agar.other, grouping_variable2 = MALDI.system)
 plot_data<-summarise_prop_and_eval(eval_file = eval_stat_q, ID_eval_out = eval2, grouping_variable1 = "agar.other", grouping_variable2 = "MALDI.system")
+# remove the 91 rows with NA values which correspond to the frac_peaks_repr_2spectra fro device 30 and device 42 were only one technical replicte was measured for baseline quality assessment
+plot_data <- plot_data[!is.na(plot_data$value),]
 f7_how<-plot_plot_data(plot_data = plot_data, grouping_variable = agar.other)
 f7_how
 
 # How long the matrix is kept in the routine workflow for
 eval2<-ID_eval(eval_file = eval_stat_q, grouping_variable1 = How.long.do.you.keep.the.same.matrix.in.the.workflow., grouping_variable2 = MALDI.system)
 plot_data<-summarise_prop_and_eval(eval_file = eval_stat_q, ID_eval_out = eval2, grouping_variable1 = "How.long.do.you.keep.the.same.matrix.in.the.workflow.", grouping_variable2 = "MALDI.system")
+# remove the 91 rows with NA values which correspond to the frac_peaks_repr_2spectra fro device 30 and device 42 were only one technical replicte was measured for baseline quality assessment
+plot_data <- plot_data[!is.na(plot_data$value),]
 plot_data$How.long.do.you.keep.the.same.matrix.in.the.workflow.<-factor(plot_data$How.long.do.you.keep.the.same.matrix.in.the.workflow., levels = c('maximal 1 day', 'maximal a week', 'maximal a month'), labels = c('max. 1 day','max. 1 week','max. 1 month'))
 f7_how_long_matrix <- plot_plot_data_highlight(plot_data = plot_data, grouping_variable = How.long.do.you.keep.the.same.matrix.in.the.workflow., highlight_color = "#2A9D8F")
 f7_how_long_matrix <- f7_how_long_matrix + ggtitle('Duration of matrix usage') + stat_compare_means(method = 'wilcox', paired = F, label = 'p.signif', label.y.npc = 0.9, ref.group = 'max. 1 day', alpha = c(rep(1, 8), rep(0, 4)))
@@ -673,12 +701,16 @@ f7_how_long_matrix <- f7_how_long_matrix + ggtitle('Duration of matrix usage') +
 # Whether routinely, unknown samples are overlaid with formic acid or not
 eval2<-ID_eval(eval_file = eval_stat_q, grouping_variable1 = FA.applied.routinely.bacteria, grouping_variable2 = MALDI.system)
 plot_data<-summarise_prop_and_eval(eval_file = eval_stat_q, ID_eval_out = eval2, grouping_variable1 = "FA.applied.routinely.bacteria", grouping_variable2 = "MALDI.system")
+# remove the 91 rows with NA values which correspond to the frac_peaks_repr_2spectra fro device 30 and device 42 were only one technical replicte was measured for baseline quality assessment
+plot_data <- plot_data[!is.na(plot_data$value),]
 f7_how<-plot_plot_data(plot_data = plot_data, grouping_variable = FA.applied.routinely.bacteria)
 f7_how
 
 # Whether the participating laboratory works with a MALDI workstation (for a certain period of time, one person perocessed all sample for MALDI measurements)
 eval2<-ID_eval(eval_file = eval_stat_q, grouping_variable1 = MALDI.station, grouping_variable2 = MALDI.system)
 plot_data<-summarise_prop_and_eval(eval_file = eval_stat_q, ID_eval_out = eval2, grouping_variable1 = "MALDI.station", grouping_variable2 = "MALDI.system")
+# remove the 91 rows with NA values which correspond to the frac_peaks_repr_2spectra fro device 30 and device 42 were only one technical replicte was measured for baseline quality assessment
+plot_data <- plot_data[!is.na(plot_data$value),]
 plot_data$MALDI.station<-factor(plot_data$MALDI.station, levels = c("yes", "no"))
 f7_MALDI_station <- plot_plot_data_highlight(plot_data = plot_data, grouping_variable = MALDI.station, highlight_color = "#2A9D8F")
 f7_MALDI_station <- f7_MALDI_station + ggtitle('Rotating MALDI workstation')+ stat_compare_means(method = 'wilcox', paired = F, label = 'p.signif', label.y.npc = 0.9, ref.group = 'yes', alpha = c(rep(1, 4), rep(0, 2)))
@@ -688,6 +720,7 @@ metaplot<-cowplot::plot_grid(f7_hardware + theme(axis.text=element_text(size=8),
                              f7_MALDI_station + theme(axis.text=element_text(size=8), strip.text.y = element_text(size = 6), axis.title=element_text(size=8), legend.position = 'none'),
                              f7_how_long_matrix + theme(axis.text=element_text(size=8), strip.text.y = element_text(size = 6), axis.title=element_text(size=8), legend.position = 'none'),
                              rel_widths = c(0.16, 0.16, 0.2), ncol = 3, align = 'h')
+# a warning will be displayed stating tha the computation failed. this comes from the fact that there is no two groups to compare in the vitekMS group, all laboratories stated regularly performing a hardware service. 
 
 pdf('./questionnaire_metaplot_2.pdf', width = 8.28, height = 4)
 metaplot
