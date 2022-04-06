@@ -8,6 +8,7 @@ library('sjPlot')
 library('ggpubr')
 library('rstatix')
 
+
 #### Define functions
 ## This function 'ID_eval' counts the proportion of spectra which have been identified correctly / multispecies correctly / not identified / wrongly identified with three different spectra identification databases (microflex Biotyper database, VitekMS database or a marker based spectral identification)
 ## The input to this function are 
@@ -114,13 +115,13 @@ plot_plot_data<-function(plot_data, grouping_variable){
 # (iii) Hex code of the highlighting colour
 plot_plot_data_highlight<-function(plot_data, grouping_variable, highlight_color){
   gp_enc <- deparse(substitute(grouping_variable))
-  avals1 = c(1, rep(0.4, length(unique(plot_data[[gp_enc]]))))
+  avals1 = c(1, rep(1, length(unique(plot_data[[gp_enc]]))))
   avalsHex = paste0("#000000", toupper(as.hexmode(round(avals1*255))))
   grouping_variable <- enquo(grouping_variable)
   f1 <- ggplot(plot_data, aes(x=as.factor(!!grouping_variable), y=as.numeric(as.character(value)), ymin=0,ymax=value)) + annotate("rect", xmin = -Inf, xmax = 1.5, ymin = -Inf, ymax = Inf, fill = highlight_color, alpha = .3) +facet_grid(Endpoint ~ MALDI.system, scales = 'free_y') + theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none") +
   ylab('') +xlab('')   
-  f2 <- f1+geom_boxplot(data = plot_data[grepl('N.*marker.*',plot_data$Endpoint),], aes(color=!!grouping_variable, alpha = !!grouping_variable)) +  scale_alpha_manual(values = avals1) + scale_colour_manual(values = avalsHex)
-  f4 <- f2+geom_boxplot(data = plot_data[grepl('.*eproducibility.*',plot_data$Endpoint),], aes(color=!!grouping_variable, alpha =!!grouping_variable)) 
+  f2 <- f1+geom_boxplot(data = plot_data[grepl('N.*marker.*',plot_data$Endpoint),], aes(color=!!grouping_variable, alpha = !!grouping_variable), lwd=0.3) +  scale_alpha_manual(values = avals1) + scale_colour_manual(values = avalsHex)
+  f4 <- f2+geom_boxplot(data = plot_data[grepl('.*eproducibility.*',plot_data$Endpoint),], aes(color=!!grouping_variable, alpha =!!grouping_variable), lwd=0.3) 
   f5 <- f4+geom_col(data = plot_data[grepl('.*Marker.*ID.*',plot_data$Endpoint),], aes(fill=eval, alpha =!!grouping_variable), width = 0.7)
   f7 <- f5+scale_fill_manual('Identification',
                              breaks = c("prop.correct.marker.single","prop.correct.marker.multi", "prop.noID.marker","prop.wrong.marker.single" ),
@@ -212,7 +213,7 @@ eval['VitekMS.DBcorrect_species_identified']<-ifelse(eval$VitekMS.DBidentifType 
                                                                  ifelse(eval$vitekMSDB.correct_species_identified == 1, TRUE, NA)))
 
 # Import questionnaire
-questionnaire_raw<-read.csv2('./Table S3_questionnaire.csv', sep=',',na.strings=c(""," ","NA"))
+questionnaire_raw<-read.csv2('./Table\ S3_questionnaire.csv', sep=',',na.strings=c(""," ","NA"))
 questionnaire_raw<-questionnaire_raw[!is.na(questionnaire_raw$lab),]
 # save all columns as character
 questionnaire_raw<-questionnaire_raw %>%
@@ -627,7 +628,8 @@ targetplot<-cowplot::plot_grid(f7_how_processed + theme(axis.text=element_text(s
                                f7_how_clean+ theme(axis.text=element_text(size=8), strip.text.y = element_text(size = 5.5), axis.title=element_text(size=8), legend.position = 'none'),
                                rel_widths = c(0.2, 0.14, 0.18), ncol = 3, align = 'h')
 
-pdf('./questionnaire_targets_2.pdf', width = 8.28, height = 4)
+#pdf('./questionnaire_targets_2.pdf', width = 8.28, height = 4)
+pdf('./questionnaire_targets_2b.pdf', width = 8.28, height = 6)
 targetplot
 dev.off()
 
@@ -720,9 +722,10 @@ metaplot<-cowplot::plot_grid(f7_hardware + theme(axis.text=element_text(size=8),
                              f7_MALDI_station + theme(axis.text=element_text(size=8), strip.text.y = element_text(size = 6), axis.title=element_text(size=8), legend.position = 'none'),
                              f7_how_long_matrix + theme(axis.text=element_text(size=8), strip.text.y = element_text(size = 6), axis.title=element_text(size=8), legend.position = 'none'),
                              rel_widths = c(0.16, 0.16, 0.2), ncol = 3, align = 'h')
-# a warning will be displayed stating tha the computation failed. this comes from the fact that there is no two groups to compare in the vitekMS group, all laboratories stated regularly performing a hardware service. 
+# a warning will be displayed stating the computation failed. this comes from the fact that there is no two groups to compare in the vitekMS group, all laboratories stated regularly performing a hardware service. 
 
-pdf('./questionnaire_metaplot_2.pdf', width = 8.28, height = 4)
+#pdf('./questionnaire_metaplot_2.pdf', width = 8.28, height = 4)
+pdf('./questionnaire_metaplot_2b.pdf', width = 8.28, height = 6)
 metaplot
 dev.off()
 
