@@ -5,6 +5,7 @@ library(ggpubr)
 library(rstatix)
 library(stringr)
 
+
 #import sumary file from the baseline quality assessment
 sum_round_1 <- read.csv2('./Spectra_and_SpeciedID/01_baseline_quality_assessment/eval_participating_labs_1.txt')
 # remove empty spectra
@@ -149,6 +150,21 @@ colnames(sum)[colnames(sum) == 'median_intensity'] <- 'median_intensity'
 sum['MALDI.device.type']<-ifelse(sum$MALDI.device_full %in% bruker.devices, 'MBT Biotyper', 'VitekMS / Axima Confidence')
 sum['MALDI.device.type']<-factor(sum$MALDI.device.type, levels = c('MBT Biotyper', 'VitekMS / Axima Confidence'))
 
+## Summarise per strain, protocol and database how many correct identification
+sum_id <- sum[sum$method %in% c(0,1,2),] %>% # leave out 'method 3'
+  group_by(strainnumber, Strain, method) %>%
+  summarise(correct_bruker =  sum(grepl('TRUE', brukerDB.correct_species_identified)),
+            all_bruker = sum(grepl('TRUE|FALSE|no ID', brukerDB.correct_species_identified)), 
+            perc_correct_bruker = sum(grepl('TRUE', brukerDB.correct_species_identified))/ sum(grepl('TRUE|FALSE|no ID', brukerDB.correct_species_identified)), 
+            correct_vitek = sum(grepl('TRUE', VitekMS.DBcorrect_species_identified)), 
+            all_vitek = sum(grepl('TRUE|FALSE|noID', VitekMS.DBcorrect_species_identified)), 
+            perc_correct_vitek = sum(grepl('TRUE', VitekMS.DBcorrect_species_identified)) / sum(grepl('TRUE|FALSE|noID', VitekMS.DBcorrect_species_identified)), 
+            correct_marker = sum(grepl('TRUE', markerDB.correct_species_identified)), 
+            all_marker = sum(grepl('TRUE|FALSE|no ID', markerDB.correct_species_identified)), 
+            perc_correct_marker = sum(grepl('TRUE', markerDB.correct_species_identified)) / sum(grepl('TRUE|FALSE|no ID', markerDB.correct_species_identified)))
+
+write.csv2(sum_id, './01_Spectra/04_outputs/sum_id.csv', quote = F, row.names = F)
+
 ### plot baseline quality assessment results
 # plot the mean measurement error [ppm] per device
 dist_ppm<-ggplot(sum[sum$method == '0',], aes(x=reorder(device_id, mean_dist_ppm,na.rm = TRUE, FUN = median), y=mean_dist_ppm, col = MALDI.device.type)) +
@@ -197,7 +213,7 @@ eval2_sum_correct['marker_correct']<-eval2$prop.correct.marker.single + eval2$pr
 eval2$n_correct_single<-NULL
 eval2$n_all_spectra_ID<-NULL
 
-# check prop of correct species idnetification per strain for the baseline quality assessment
+# check prop of correct species identification per strain for the baseline quality assessment
 eval2_strain <- sum[sum$method == '0',] %>%
   group_by(Strain, strainnumber) %>%
   dplyr::summarize(prop.correct.marker.single = sum(grepl('TRUE', markerDB.correct_single_species) & grepl('TRUE', markerDB.correct_species_identified)) /sum(grepl('TRUE|FALSE|no ID', markerDB.correct_species_identified)),             
@@ -208,6 +224,7 @@ eval2_strain <- sum[sum$method == '0',] %>%
                    n_all_spectra_ID = sum(grepl('TRUE|FALSE|no ID', markerDB.correct_species_identified))) 
 # add proportion of 'marker correct' referring to the ones which have been identified on single species level AND the ones which which include the correct species in their multispecies ID
 eval2_strain['marker_correct']<-eval2_strain$prop.correct.marker.single + eval2_strain$prop.correct.marker.multi
+
 # the eval2_strain will not be used for further analysis, continue with eval2 which includes proportions per device
 
 # merge these proportions back to the dataframe
@@ -232,6 +249,16 @@ eval_prop_long['DB']<-ifelse(grepl('bruker', eval_prop_long$classification_eval_
                                     ifelse(grepl('VitekMS', eval_prop_long$classification_eval_prop), 'VitekMS', NA)))
 # create 'eval' column
 eval_prop_long['eval']<-eval_prop_long$classification_eval_prop
+
+# check whether there is a correlation between (i) the fraction of correctly identified spectra (single and multi-species identification together) and (ii) the median number of detected marker masses per device
+sum_round_1_median_marker <- sum_round_1 %>% 
+  group_by(MALDI.device_full) %>%
+  summarise(median_nr_marker = median(n_ribos_detected))
+
+corr_check <- merge(eval2[, c('MALDI.device_full','prop.correct.marker.single','prop.correct.marker.multi')], sum_round_1_median_marker, by = 'MALDI.device_full')
+corr_check['correct_marker_prop'] <- corr_check$prop.correct.marker.single + corr_check$prop.correct.marker.multi
+
+cor(corr_check$median_nr_marker, corr_check$correct_marker_prop, method = "pearson")
 
 # define colours which species evaluation willbe drawn in
 #"prop.bruker.correct.single.over.two"      #009E73
